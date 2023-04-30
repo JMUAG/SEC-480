@@ -1,0 +1,8 @@
+{
+    "vcenter_server" : "vcenter",
+    "base_vm_folder" : "BASEVM",
+    "prod_vm_folder" : "PROD",
+    "esxi_host" : "192.168.7.26",
+    "default_network" : "480-WAN"
+    
+}
