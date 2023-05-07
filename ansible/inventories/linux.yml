@@ -1,0 +1,37 @@
+#Rocky box IP Mapping
+linux:
+  hosts:
+  children:
+    rocky:
+      hosts:
+        10.0.5.78:
+          hostname: rocky.01
+          lan_ip: 10.0.5.10
+        10.0.5.79:
+          hostname: rocky.02
+          lan_ip: 10.0.5.11
+        10.0.5.80:
+          hostname: rocky.03
+          lan_ip: 10.0.5.12
+      vars:
+        device: ens192
+#Ubuntu box IP Mapping
+    ubuntu:
+      hosts:
+        10.0.5.81:
+          hostname: ubuntu.01
+          lan_ip: 10.0.5.30
+        10.0.5.82:
+          hostname: ubuntu.02
+          lan_ip: 10.0.5.31
+      vars:
+        device: ens33
+  vars:
+    public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCbPpx/zmTkR00TN8vE7WYS3GSq7w6/14LDsFGm8VY9AvfZN5DFG2XxbjGnPUvnEHEXQBLOFztwbtu3SyIp6V4EayVrJa65qW2NbbwfrM9IGRNISlfPDg2tdI9gA6GyRPv5L/mpN0Y9AxckoJ5e+V0N3p+QyABYerxYsUs9F3oGg/WwlyhcehAYTo4c8cWPdwgtNMqB+dgxRBtDToBRpHkOs62XDHSciq2Vd6c+cgAbiBWz/jkfLfiqxfUhOHqIrArvqDkzn5kfc2MYv+hdTVWhOv0qTa6TUgyXnKc41FUICPBMdzC7nXfzLKoG7FYKQ8FQkUNNOT0w/FNcsEseeRHIJscplSmsDHpaEP+/JRxzjDrwcqlDlBt4/GQzf7rkuiY17OQkFGm7rz1zmaXyc52o/7YfhExuF8fjGEb5TtEgglU7Ud7VKmEXTIKE1rMWLfzFikmfXMLQLJQe9FCugUc7kordL2YghOoEP0UqtinM2FvVs0KyHyecxNckIcS4uYk= jahseem-480@xubuntu-wan"
+    #ansible_user: jahseem
+    ansible_user: rangeuser
+    prefix: 24
+    gateway: 10.0.5.2
+    name_server: 10.0.5.5
+    domain: blue1.local
+    

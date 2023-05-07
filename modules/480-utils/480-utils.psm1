@@ -108,7 +108,7 @@ Function Select-All-VM()
 Function LinkedClone([string] $folder)
 {
     #$input =  Read-Host "What is the name of your VM: "
-    $vm = Select-VM -folder $folder
+    $vm = Select-All-VM -folder $folder
     #$vm = Get-VM -Name $select_vm
     $input1 = Read-Host "What is the name of your base clone: "
     $snapshot = Get-Snapshot -VM $vm -Name $input1
@@ -171,7 +171,7 @@ Function VMStart([string] $folder)
 {
     try
     {
-        $vm = Select-VM -folder $folder
+        $vm = Select-All-VM #-folder $folder
         Start-VM -VM $vm -Confirm:$false 
         Write-Host ""
     }
@@ -199,7 +199,7 @@ Function Show-Network()
 }
 Function SelectAdapter([string] $folder)
 {
-    $vm = Select-VM($folder)
+    $vm = Select-All-VM($folder)
     $adap = Get-NetworkAdapter -vm $vm #| Select-Object Name
     
    # foreach ($x in $adap) {
@@ -227,4 +227,19 @@ Function Set-Network([string] $folder)
     Set-NetworkAdapter -NetworkAdapter $adap -NetworkName (Read-Host -Prompt "Enter the network of your choice") -Confirm:$false 
 }
 
-
+Function WinIPV4([string] $folder)
+{
+    $vm = Select-All-VM($folder)
+    $account = Read-Host "Input your user account"
+    $pswd = Read-Host -AsSecureString "Set the Password"
+    Invoke-VMScript -ScriptText "Get-NetAdapter | Select-Object Name" -VM $vm -GuestUser $account -GuestPassword $pswd
+    $adap = Read-Host "Select your network adapter"
+    $addr = Read-Host "Set your IP Address"
+    $cidr = Read-Host "Set your CIDR"
+    $gateway = Read-Host "Set your default gateway"
+    $dns = Read-Host "Set your name server"
+    $netsh1 = "netsh interface ipv4 set address '$adap' static $addr $cidr $gateway"
+    $netsh2 = "netsh interface ipv4 add dns '$adap' $dns index=1"
+    Invoke-VMScript -ScriptText $netsh1 -VM $vm -GuestUser $account -GuestPassword $pswd
+    Invoke-VMScript -ScriptText $netsh2 -VM $vm -GuestUser $account -GuestPassword $pswd
+}

@@ -1,0 +1,57 @@
+- name: Inputs
+  hosts: 10.0.5.5
+  vars_prompt:
+
+  - name: User
+    prompt: Input your Username
+    private: false
+
+  - name: Passwd
+    prompt: Input your Password
+
+  - name: Domain 
+    prompt: Input your Domain
+    private: false
+    
+  - name: VM
+    prompt: Input the VM name
+    private: false
+    
+  vars: 
+    ansible_shell_type: powershell
+  tasks:
+  - name: Active Directory Domain Services
+    ansible.windows.win_powershell: 
+      script: |
+        Rename-Computer -NewName "{{ VM }}"
+
+  - name: Forest Implementation
+    ansible.windows.win_domain: 
+      dns_domain_name: "{{ Domain }}"
+      safe_mode_password: "{{ Passwd }}"
+    register: domain_install
+
+  - name: Reboot
+    win_reboot:
+      reboot_timeout: 300
+    when: domain_install.reboot_required
+
+  - name: Domain Admin Group Implementation
+    win_domain_group_membership:
+      name: "Domain Admins"
+      members:
+        - "{{ User }}"
+      state: present
+
+  - name: Organizational Unit Implementation
+    ansible.windows.win_powershell:
+      script: |
+        Add-OU -Identity "BLUE1" -Members deployer
+        New-ADOrganizationalUnit -Name "Blue1" -Path "DC=BLUE1,DC=LOCAL"
+        New-ADOrganizationalUnit -Name "Accounts" -Path "OU=BLUE1,DC=BLUE1,DC=LOCAL"
+        New-ADOrganizationalUnit -Name "Computers" -Path "OU=BLUE1,DC=BLUE1,DC=LOCAL"
+        New-ADOrganizationalUnit -Name "Groups" -Path "OU=Accounts,OU=BLUE1,DC=BLUE1,DC=LOCAL"
+        New-ADOrganizationalUnit -Name "Servers" -Path "OU=Computers,OU=BLUE1,DC=BLUE1,DC=LOCAL"
+        New-ADOrganizationalUnit -Name "Workstations" -Path "OU=Computers,OU=BLUE1,DC=BLUE1,DC=LOCAL"
+
+#Gained Assistance via Sam Guinther & Sarah Fornaldes

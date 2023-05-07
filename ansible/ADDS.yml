@@ -1,0 +1,22 @@
+---
+- hosts: win
+  become: yes
+
+  vars:
+    csv_file: inventories/nba.csv
+    ou_name: groups
+
+  tasks:
+    - name: Read CSV file
+      read_csv:
+        path: "{{ csv_file }}"
+        delimiter: ","
+      register: csv_data
+
+    - name: Create groups
+      shell: |
+        for group in $(echo "{{ csv_data.list | map(attribute='group_name') | unique }}" | tr ' ' '\n'); do
+          samba-tool group add "${group}" --groupou="OU={{ ou_name }},{{ ansible_domain}}";
+        done
+      register: output
+
